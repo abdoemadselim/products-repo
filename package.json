@@ -1,0 +1,40 @@
+{
+  "name": "adaa-backend",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "imports": {
+    "#root/*": "./dist/*",
+    "#features/*": "./dist/features/*",
+    "#lib/*": "./dist/lib/*",
+    "#routes/*": "./dist/routes/*",
+    "#middlewares/*": "./dist/middlewares/*"
+  },
+  "main": "./dist/main.js",
+  "scripts": {
+    "start": "node --watch ./dist/main.js",
+    "watch": "tsc --watch",
+    "build": "rm -rf dist && tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^2.2.0",
+    "dotenv": "^17.2.2",
+    "express": "^5.1.0",
+    "pg": "^8.16.3",
+    "winston": "^3.17.0",
+    "zod": "^4.1.5"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/body-parser": "^1.19.6",
+    "@types/cookie-parser": "^1.4.9",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/pg": "^8.15.5",
+    "typescript": "^5.8.3"
+  }
+}

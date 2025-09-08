@@ -1,0 +1,35 @@
+{
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ],
+  "compilerOptions": {
+    "outDir": "./dist",
+    "baseUrl": "src",
+    "rootDir": "./src",
+    "target": "ES2021",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "esModuleInterop": true,
+    "paths": {
+      "#root/*": [
+        "*"
+      ],
+      "#features/*": [
+        "features/*"
+      ],
+      "#lib/*": [
+        "lib/*"
+      ],
+      "#routes/*": [
+        "routes/*"
+      ],
+      "#middlewares/*": [
+        "middlewares/*"
+      ]
+    }
+  }
+}
