@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import * as productsService from "#features/products/service/products.service.js";
 import { NoException, ValidationException } from "#lib/error-handling/error-types.js";
 import { log, LOG_TYPE } from "#root/lib/logger/logger.js";
+import { ProductType } from "../types.js";
 
 export async function getProductsPage(req: Request, res: Response) {
     const start = Date.now();
@@ -99,6 +100,79 @@ export async function updateProduct(req: Request, res: Response) {
 
     log(LOG_TYPE.INFO, {
         message: "Update Product",
+        method: req.method,
+        path: req.originalUrl,
+        status: 200,
+        durationMs,
+    })
+
+    // 4- send the response
+    res.json(response)
+}
+
+export async function getAllProductsStatus(req: Request, res: Response) {
+    const start = Date.now();
+
+    //2- pass the data to the service
+    const productsStatus = await productsService.getAllProductsStatus()
+
+    //3- prepare the response
+    const response = {
+        data: {
+            productsStatus
+        },
+        errors: [],
+        code: NoException.NoErrorCode,
+        errorCode: NoException.NoErrorCodeString
+    }
+
+    const durationMs = Date.now() - start;
+
+    log(LOG_TYPE.INFO, {
+        message: "Get All Products Status",
+        method: req.method,
+        path: req.originalUrl,
+        status: 200,
+        durationMs,
+    })
+    res.json(response)
+
+}
+
+export async function createProduct(req: Request, res: Response) {
+    const start = Date.now();
+
+    // 1- prepare the data for the service
+    const { name, category, stock, status, status_label, price, description } = req.body as Partial<ProductType>;
+
+    // 2- pass the prepared data to the service
+    const product = {
+        name,
+        category,
+        stock,
+        status,
+        status_label,
+        price,
+        description
+    }
+
+    const created_product = await productsService.createProduct(product)
+
+    // 3- prepare the response
+    const response = {
+        data: {
+            created_product
+        },
+        errors: [],
+        code: NoException.NoErrorCode,
+        errorCode: NoException.NoErrorCodeString,
+    }
+
+    // TODO: Can't be abstracted?
+    const durationMs = Date.now() - start;
+
+    log(LOG_TYPE.INFO, {
+        message: "Create new Product",
         method: req.method,
         path: req.originalUrl,
         status: 200,

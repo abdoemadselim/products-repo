@@ -21,7 +21,7 @@ export const NewUserSchema = zod.object({
     name: zod
         .string("يُرجى إدخال الاسم.")
         .trim()
-        .min(5, "يُرجى إدخال الاسم.")
+        .min(1, "يُرجى إدخال الاسم.")
         .max(40, "الاسم يجب ألا يتجاوز 40 حرفًا."),
 
     email: EmailSchema,

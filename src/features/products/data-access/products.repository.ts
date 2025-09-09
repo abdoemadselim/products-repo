@@ -12,19 +12,18 @@ const productRepository = {
         let total_pages_result;
         let search_words = search.trim().split(" ").join("|");
 
-        console.log(search_words)
         if (hasSearch) {
             // Query with search
             products_result = query(
                 `
-              SELECT product.id as id, product.name as name, category.name as category, stock, status, price, added_at, description
+              SELECT product.id as id, product.name as name, category.name as category, created_at, stock, status, price, description
               FROM product JOIN category
               ON product.category_id = category.id
               WHERE search_vector @@ to_tsquery('arabic', $1)
-              ORDER BY added_at DESC
+              ORDER BY created_at DESC
               OFFSET $2 LIMIT $3;
             `,
-            // @ts-ignore
+                // @ts-ignore
                 [search_words, offset, page_size]
             );
 
@@ -41,13 +40,13 @@ const productRepository = {
             // Query without search - get all products
             products_result = query(
                 `
-              SELECT product.id as id, product.name as name, category.name as category, stock, status, price, added_at, description
+              SELECT product.id as id, product.name as name, category.name as category, created_at, stock, status, price, description
               FROM product JOIN category
               ON product.category_id = category.id
               ORDER BY created_at DESC
               OFFSET $1 LIMIT $2;
             `,
-            // @ts-ignore
+                // @ts-ignore
                 [offset, page_size]
             );
 
@@ -84,29 +83,61 @@ const productRepository = {
     },
 
     async updateProduct(product_id: number, product_data: Partial<ProductType>) {
-        const fields: string[] = [];
-        const values: any[] = [];
-        let i = 1;
+        const categoryResults = await query(
+            `
+                SELECT id as category_id FROM category 
+                WHERE name = $1
+            `,
+            [product_data.category]
+        )
 
-        for (const key of Object.keys(product_data)) {
-            // @ts-ignore
-            if (product_data[key] !== undefined) {
-                fields.push(`${key} = $${i}`);
-                // @ts-ignore
-                values.push(product_data[key]);
-                i++;
-            }
-        }
-
-        values.push(product_id);
-
+        const category_id = categoryResults.rows[0].category_id;
         const result = await query(
             `UPDATE product
-            SET ${fields.join(", ")}
-            WHERE id = $${i}
-            RETURNING id`, values);
+             SET name = $1, price = $2, category_id = $3, stock = $4, status = $5, description = $6
+             WHERE id = $7
+             RETURNING id`,
+            // @ts-ignore
+            [product_data.name, product_data.price, category_id, product_data.stock, product_data.status, product_data.description, product_id]);
 
         return result.rows[0];
+    },
+
+    async getAllProductsStatus() {
+        const result = await query(`
+               SELECT name as status
+               FROM status
+            `)
+        return result.rows;
+    },
+
+    async createProduct(product: Partial<ProductType>) {
+        const {
+            name, category, description, price, stock, status
+        } = product;
+
+        const categoryResults = await query(
+            `
+                SELECT id as category_id FROM category 
+                WHERE name = $1
+            `,
+            [category]
+        )
+
+        let result;
+        if (categoryResults.rows.length) {
+            const category_id = categoryResults.rows[0].category_id;
+            result = await query(
+                `
+                INSERT INTO product(name, category_id, description, price, stock, status)
+                VALUES($1, $2, $3, $4, $5, $6);
+                `,
+                // @ts-ignore
+                [name, category_id, description, price, stock, status]
+            )
+        }
+
+        return result.rows[0]
     }
 
 }

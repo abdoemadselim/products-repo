@@ -1,11 +1,14 @@
 import dotenv from 'dotenv'
 dotenv.config();
 import express from "express"
-import { logger } from "#lib/logger/logger.js";
-import routes from "#features/routes.js"
 import bodyParser from "body-parser";
 import cors from "cors"
 import compression from "compression"
+
+import { logger } from "#lib/logger/logger.js";
+import routes from "#features/routes.js"
+import errorHandlerMiddleware from "#middlewares/error-handler.js";
+import cookieParser from 'cookie-parser';
 
 const app = express();
 const allowedOrigins = [
@@ -13,6 +16,7 @@ const allowedOrigins = [
   "http://localhost:3002",
 ];
 
+app.use(cookieParser())
 app.use(compression())
 app.use(
   cors({
@@ -34,6 +38,9 @@ app.use(
 
 app.use(bodyParser.json())
 app.use(routes)
+
+// ----- Error Handler Middleware ----------
+app.use(errorHandlerMiddleware)
 
 const PORT = process.env.PROT || 3000;
 app.listen(PORT, () =>

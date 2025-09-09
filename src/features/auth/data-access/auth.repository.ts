@@ -1,4 +1,4 @@
-import { NewUserType } from "#features/auth/schema/auth.schema.js";
+import { NewUserType } from "#features/auth/domain/auth.schemas.js";
 
 // TODO: auth feature depends on user feature (is it OK?)
 import type { UserType } from "#features/user/type.js";

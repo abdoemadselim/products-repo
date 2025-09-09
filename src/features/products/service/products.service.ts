@@ -24,3 +24,15 @@ export async function updateProduct(product_id: number, toUpdateProductData: Par
 
     return result;
 }
+
+export async function createProduct(product: Partial<ProductType>) {
+    // 2. Update the existing product
+    const result = await productRepository.createProduct(product)
+    return result;
+}
+
+export async function getAllProductsStatus() {
+    const productsStatus = await productRepository.getAllProductsStatus();
+    return productsStatus;
+}
+

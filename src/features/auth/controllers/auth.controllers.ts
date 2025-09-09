@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import type { Request, Response } from "express";
 
-import type { NewUserType } from "#features/auth/schema/auth.schema.js"; 
+import type { NewUserType } from "#features/auth/domain/auth.schemas.js"; 
 import * as authService from "#features/auth/domain/auth.service.js"
 
 import { client as redisClient } from "#lib/db/redis-connection.js"
@@ -265,7 +265,7 @@ export async function logout(req: Request, res: Response) {
 
 export async function verifyUser(req: Request, res: Response) {
     const sessionId = req.cookies[process.env.AUTH_SESSION_NAME as string];
-
+    
     if (!sessionId) {
         throw new UnAuthorizedException()
     }

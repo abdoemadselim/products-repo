@@ -6,13 +6,12 @@ import jwt, { JwtPayload } from "jsonwebtoken"
 // TODO: auth feature depends on user feature (Is this OK?)
 import userRepository from "#features/user/data-access/user.repository.js";
 import authRepository from "#features/auth/data-access/auth.repository.js";
-import type { NewUserType } from "#features/auth/schema/auth.schema.js";
-import { LoginException, UnVerifiedException } from "#features/auth/domain/error-types.js";
+import type { NewUserType } from "#features/auth/domain/auth.schemas.js";
+import { LoginException } from "#features/auth/domain/error-types.js";
 
-import { NotFoundException, ResourceExpiredException, UnAuthorizedException, ValidationException } from "#lib/error-handling/error-types.js";
+import { ResourceExpiredException, UnAuthorizedException, ValidationException } from "#lib/error-handling/error-types.js";
 // import { sendVerificationMail } from "#lib/email/email.js";
 import { client as redisClient } from "#lib/db/redis-connection.js"
-import { log, LOG_TYPE } from "#lib/logger/logger.js";
 
 // TODO: Can't we create a new type instead of omitting the password_confirmation everywhere?
 export async function createUser({ email, password, name }: Omit<NewUserType, "password_confirmation">) {

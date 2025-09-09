@@ -5,7 +5,6 @@ export type ProductType = {
     price: number,
     stock: number,
     status: string,
-    status_label: string,
     createdAt: string,
     description: string
 }
