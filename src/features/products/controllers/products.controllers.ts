@@ -6,10 +6,10 @@ import { log, LOG_TYPE } from "#root/lib/logger/logger.js";
 export async function getProductsPage(req: Request, res: Response) {
     const start = Date.now();
     //1- prepare the data for the service
-    const { page = 0, pageSize = 10 } = req.query
+    const { page = 0, pageSize = 10, search = "" } = req.query
 
     //2- pass the data to the service
-    const { products, total } = await productsService.getProductsPage({ page: Number(page), page_size: Number(pageSize) })
+    const { products, total } = await productsService.getProductsPage({ page: Number(page), page_size: Number(pageSize), search: search.toString() })
 
     //3- prepare the response
     const response = {
@@ -70,7 +70,7 @@ export async function updateProduct(req: Request, res: Response) {
 
     // 1- prepare the data for the service
     const { product_id } = req.params;
-    const { name, category, stock, status, price, description } = req.body ;
+    const { name, category, stock, status, price, description } = req.body;
 
     // 2- pass the prepared data to the service
     const product = {

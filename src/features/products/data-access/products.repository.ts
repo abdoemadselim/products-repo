@@ -2,23 +2,59 @@ import { query } from "#lib/db/db-config.js";
 import { ProductType } from "../types.js";
 
 const productRepository = {
-    async getProductsPage({ page, page_size }: { page: number, page_size: number }) {
+    async getProductsPage({ page, page_size, search }: { page: number, page_size: number, search: string }) {
         const offset = page * page_size;
-        const products_result = query(
-            `
+
+        // Check if search is empty or just whitespace
+        const hasSearch = search && search.trim().length > 0;
+
+        let products_result;
+        let total_pages_result;
+        let search_words = search.trim().split(" ").join("|");
+
+        console.log(search_words)
+        if (hasSearch) {
+            // Query with search
+            products_result = query(
+                `
+              SELECT product.id as id, product.name as name, category.name as category, stock, status, price, added_at, description
+              FROM product JOIN category
+              ON product.category_id = category.id
+              WHERE search_vector @@ to_tsquery('arabic', $1)
+              ORDER BY added_at DESC
+              OFFSET $2 LIMIT $3;
+            `,
+            // @ts-ignore
+                [search_words, offset, page_size]
+            );
+
+            total_pages_result = query(
+                `
+              SELECT COUNT(*) as total 
+              FROM product JOIN category
+              ON product.category_id = category.id
+              WHERE search_vector @@ to_tsquery('arabic', $1)
+            `,
+                [search_words]
+            );
+        } else {
+            // Query without search - get all products
+            products_result = query(
+                `
               SELECT product.id as id, product.name as name, category.name as category, stock, status, price, added_at, description
               FROM product JOIN category
               ON product.category_id = category.id
               ORDER BY created_at DESC
-              OFFSET $1 LIMIT $2
+              OFFSET $1 LIMIT $2;
             `,
             // @ts-ignore
-            [offset, page_size]
-        )
+                [offset, page_size]
+            );
 
-        const total_pages_result = query(
-            "SELECT COUNT(*) as total FROM product",
-        )
+            total_pages_result = query(
+                "SELECT COUNT(*) as total FROM product"
+            );
+        }
 
         const result = await Promise.all([products_result, total_pages_result]);
         return { products: result[0].rows, total: Number(result[1].rows[0].total) };

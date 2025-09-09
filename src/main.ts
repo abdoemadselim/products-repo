@@ -5,18 +5,28 @@ import { logger } from "#lib/logger/logger.js";
 import routes from "#features/routes.js"
 import bodyParser from "body-parser";
 import cors from "cors"
+import compression from "compression"
 
 const app = express();
 const allowedOrigins = [
-  "https://mukhtasar.pro", // For Frontend
-  "https://www.mukhtasar.pro", // For Frontend
-  "https://api.mukhtasar.pro", // For swagger
+  "https://adaa-eight.vercel.app/", // For Frontend
   "http://localhost:3002",
 ];
 
+app.use(compression())
 app.use(
   cors({
-    origin: "*",
+    origin: (origin, callback) => {
+      // allow requests with no origin (like mobile apps, curl)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        return callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"]
   })
