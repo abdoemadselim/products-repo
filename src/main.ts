@@ -12,7 +12,7 @@ import cookieParser from 'cookie-parser';
 
 const app = express();
 const allowedOrigins = [
-  "https://adaa-eight.vercel.app/", // For Frontend
+  "https://adaa-eight.vercel.app", // For Frontend
   "http://localhost:3002",
 ];
 
@@ -42,7 +42,7 @@ app.use(routes)
 // ----- Error Handler Middleware ----------
 app.use(errorHandlerMiddleware)
 
-const PORT = process.env.PROT || 3000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () =>
   logger.info(`Server started at port ${PORT} in ${process.env.NODE_ENV} mode`)
 )
