@@ -1,0 +1,1043 @@
+{
+  "openapi": "3.0.4",
+   "info": {
+    "title": "واجهة برمجة التطبيقات لإدارة المخزون",
+    "description": "توفر هذه الواجهة نقاط نهاية لإدارة نظام مخزون مع المصادقة والمنتجات والفئات.\n\nالميزات:\n- مصادقة المستخدم (تسجيل الدخول/التسجيل/تسجيل الخروج)\n- إدارة المنتجات (عمليات الإنشاء والقراءة والتحديث والحذف)\n- المصادقة القائمة على الجلسات باستخدام الكوكيز\n",
+    "contact": {
+      "email": "support@example.com"
+    },
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Development server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Auth",
+      "description": "Authentication endpoints for user login, signup, and session management"
+    },
+    {
+      "name": "Products",
+      "description": "Product management endpoints for CRUD operations"
+    },
+    {
+      "name": "Categories",
+      "description": "Category management endpoints"
+    }
+  ],
+  "paths": {
+    "/auth/login": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "User login",
+        "description": "Authenticate user with email and password",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "User's email address",
+                    "example": "user@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "minLength": 8,
+                    "maxLength": 64,
+                    "description": "User's password (8-64 characters)",
+                    "example": "password123"
+                  }
+                },
+                "required": ["email", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "headers": {
+              "Set-Cookie": {
+                "schema": {
+                  "type": "string",
+                  "example": "sessionId=abc123; Path=/; HttpOnly; Secure; SameSite=lax"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "user": {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string",
+                              "example": "John Doe"
+                            },
+                            "email": {
+                              "type": "string",
+                              "example": "user@example.com"
+                            },
+                            "verified": {
+                              "type": "boolean",
+                              "example": true
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {},
+                      "example": []
+                    },
+                    "code": {
+                      "type": "number",
+                      "example": 0
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "example": "NO_ERROR"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/LoginError"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/auth/signup": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "User registration",
+        "description": "Create a new user account",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 40,
+                    "description": "User's full name",
+                    "example": "John Doe"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "User's email address",
+                    "example": "user@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "minLength": 8,
+                    "maxLength": 64,
+                    "description": "User's password (8-64 characters)",
+                    "example": "password123"
+                  },
+                  "password_confirmation": {
+                    "type": "string",
+                    "description": "Password confirmation (must match password)",
+                    "example": "password123"
+                  }
+                },
+                "required": ["name", "email", "password", "password_confirmation"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created successfully",
+            "headers": {
+              "Set-Cookie": {
+                "schema": {
+                  "type": "string",
+                  "example": "sessionId=abc123; Path=/; HttpOnly; Secure; SameSite=lax"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "user": {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string",
+                              "example": "John Doe"
+                            },
+                            "email": {
+                              "type": "string",
+                              "example": "user@example.com"
+                            },
+                            "isVerified": {
+                              "type": "boolean",
+                              "example": true
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {},
+                      "example": []
+                    },
+                    "code": {
+                      "type": "number",
+                      "example": 0
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "example": "NO_ERROR"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "User logout",
+        "description": "Logout user and clear session",
+        "responses": {
+          "200": {
+            "description": "Logout successful",
+            "headers": {
+              "Set-Cookie": {
+                "schema": {
+                  "type": "string",
+                  "example": "sessionId=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "example": {}
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {},
+                      "example": []
+                    },
+                    "code": {
+                      "type": "number",
+                      "example": 0
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "example": "NO_ERROR"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "tags": ["Auth"],
+        "summary": "Get current user",
+        "description": "Get current authenticated user information",
+        "responses": {
+          "200": {
+            "description": "User information retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "user": {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string",
+                              "example": "John Doe"
+                            },
+                            "email": {
+                              "type": "string",
+                              "example": "user@example.com"
+                            },
+                            "verified": {
+                              "type": "boolean",
+                              "example": true
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {},
+                      "example": []
+                    },
+                    "code": {
+                      "type": "number",
+                      "example": 0
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "example": "NO_ERROR"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          }
+        }
+      }
+    },
+    "/products": {
+      "get": {
+        "tags": ["Products"],
+        "summary": "Get products with pagination",
+        "description": "Retrieve products with pagination and optional search",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number (0-based)",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "Number of items per page",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 10
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "description": "Search query for product name or description",
+            "schema": {
+              "type": "string",
+              "example": "laptop"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Products retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "products": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Product"
+                          }
+                        },
+                        "total": {
+                          "type": "integer",
+                          "example": 50
+                        }
+                      }
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {},
+                      "example": []
+                    },
+                    "code": {
+                      "type": "number",
+                      "example": 0
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "example": "NO_ERROR"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Products"],
+        "summary": "Create new product",
+        "description": "Create a new product",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Product name",
+                    "example": "Gaming Laptop"
+                  },
+                  "category": {
+                    "type": "string",
+                    "description": "Product category name",
+                    "example": "Electronics"
+                  },
+                  "price": {
+                    "type": "number",
+                    "minimum": 0,
+                    "description": "Product price",
+                    "example": 999.99
+                  },
+                  "stock": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "Available stock quantity",
+                    "example": 10
+                  },
+                  "status": {
+                    "type": "string",
+                    "description": "Product status",
+                    "example": "active"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Product description",
+                    "example": "High-performance gaming laptop"
+                  }
+                },
+                "required": ["name", "category", "price", "stock", "status"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Product created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "created_product": {
+                          "$ref": "#/components/schemas/Product"
+                        }
+                      }
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {},
+                      "example": []
+                    },
+                    "code": {
+                      "type": "number",
+                      "example": 0
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "example": "NO_ERROR"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/products/{product_id}": {
+      "patch": {
+        "tags": ["Products"],
+        "summary": "Update product",
+        "description": "Update an existing product",
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "path",
+            "description": "Product ID to update",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 123
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Product name",
+                    "example": "Gaming Laptop Pro"
+                  },
+                  "category": {
+                    "type": "string",
+                    "description": "Product category name",
+                    "example": "Electronics"
+                  },
+                  "price": {
+                    "type": "number",
+                    "minimum": 0,
+                    "description": "Product price",
+                    "example": 1299.99
+                  },
+                  "stock": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "Available stock quantity",
+                    "example": 5
+                  },
+                  "status": {
+                    "type": "string",
+                    "description": "Product status",
+                    "example": "active"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Product description",
+                    "example": "Updated high-performance gaming laptop"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Product updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "updated_product": {
+                          "$ref": "#/components/schemas/Product"
+                        }
+                      }
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {},
+                      "example": []
+                    },
+                    "code": {
+                      "type": "number",
+                      "example": 0
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "example": "NO_ERROR"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Products"],
+        "summary": "Delete product",
+        "description": "Delete a product by ID",
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "path",
+            "description": "Product ID to delete",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 123
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Empty response data"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {},
+                      "example": []
+                    },
+                    "code": {
+                      "type": "number",
+                      "example": 0
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "example": "NO_ERROR"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/products/status": {
+      "get": {
+        "tags": ["Products"],
+        "summary": "Get all product statuses",
+        "description": "Retrieve all available product statuses",
+        "responses": {
+          "200": {
+            "description": "Product statuses retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "productsStatus": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "status": {
+                                "type": "string",
+                                "example": "active"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {},
+                      "example": []
+                    },
+                    "code": {
+                      "type": "number",
+                      "example": 0
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "example": "NO_ERROR"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/categories": {
+      "get": {
+        "tags": ["Categories"],
+        "summary": "Get all categories",
+        "description": "Retrieve all available product categories",
+        "responses": {
+          "200": {
+            "description": "Categories retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "categories": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Category"
+                          }
+                        }
+                      }
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {},
+                      "example": []
+                    },
+                    "code": {
+                      "type": "number",
+                      "example": 0
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "example": "NO_ERROR"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Product": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 123
+          },
+          "name": {
+            "type": "string",
+            "example": "Gaming Laptop"
+          },
+          "category": {
+            "type": "string",
+            "example": "Electronics"
+          },
+          "price": {
+            "type": "number",
+            "example": 999.99
+          },
+          "stock": {
+            "type": "integer",
+            "example": 10
+          },
+          "status": {
+            "type": "string",
+            "example": "active"
+          },
+          "description": {
+            "type": "string",
+            "example": "High-performance gaming laptop"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-01-24T19:41:23+00:00"
+          }
+        }
+      },
+      "Category": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "Electronics"
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "user-uuid"
+          },
+          "name": {
+            "type": "string",
+            "example": "John Doe"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "user@example.com"
+          },
+          "verified": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      }
+    },
+    "responses": {
+      "UnauthorizedError": {
+        "description": "Authentication required",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "object",
+                  "example": {}
+                },
+                "errors": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "example": ["Authentication required"]
+                },
+                "errorCode": {
+                  "type": "string",
+                  "example": "UNAUTHORIZED"
+                },
+                "code": {
+                  "type": "number",
+                  "example": 2
+                }
+              }
+            }
+          }
+        }
+      },
+      "LoginError": {
+        "description": "Invalid email or password",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "object",
+                  "example": {}
+                },
+                "errors": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "example": ["عنوان البريد الإلكتروني أو كلمة المرور خاطئين."]
+                },
+                "errorCode": {
+                  "type": "string",
+                  "example": "LOGIN_EXCEPTION"
+                },
+                "code": {
+                  "type": "number",
+                  "example": 10
+                }
+              }
+            }
+          }
+        }
+      },
+      "ValidationError": {
+        "description": "Validation failed",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "object",
+                  "example": {}
+                },
+                "errors": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "example": ["Validation error occurred"]
+                },
+                "fieldErrors": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "email": ["Invalid email format"],
+                    "password": ["Password must be at least 8 characters"]
+                  }
+                },
+                "errorCode": {
+                  "type": "string",
+                  "example": "VALIDATION_ERROR"
+                },
+                "code": {
+                  "type": "number",
+                  "example": 3
+                }
+              }
+            }
+          }
+        }
+      },
+      "NotFoundError": {
+        "description": "Resource not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "object",
+                  "example": {}
+                },
+                "errors": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "example": ["Resource not found"]
+                },
+                "errorCode": {
+                  "type": "string",
+                  "example": "NOT_FOUND"
+                },
+                "code": {
+                  "type": "number",
+                  "example": 6
+                }
+              }
+            }
+          }
+        }
+      },
+      "InternalServerError": {
+        "description": "Internal server error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "object",
+                  "example": {}
+                },
+                "errors": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "example": ["Internal server error occurred"]
+                },
+                "errorCode": {
+                  "type": "string",
+                  "example": "INTERNAL_SERVER_ERROR"
+                },
+                "code": {
+                  "type": "number",
+                  "example": 4
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "SessionCookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "sessionId",
+        "description": "Session-based authentication using HTTP-only cookies"
+      }
+    }
+  },
+  "security": [
+    {
+      "SessionCookie": []
+    }
+  ]
+}

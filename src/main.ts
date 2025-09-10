@@ -6,7 +6,7 @@ import cors from "cors"
 import compression from "compression"
 
 import { logger } from "#lib/logger/logger.js";
-import routes from "#features/routes.js"
+import routes from "#routes/routes.js"
 import errorHandlerMiddleware from "#middlewares/error-handler.js";
 import cookieParser from 'cookie-parser';
 
@@ -14,6 +14,8 @@ const app = express();
 const allowedOrigins = [
   "https://adaa-eight.vercel.app", // For Frontend
   "http://localhost:3002",
+  "http://localhost:3000",
+  "https://products-repo.onrender.com"
 ];
 
 app.use(cookieParser())

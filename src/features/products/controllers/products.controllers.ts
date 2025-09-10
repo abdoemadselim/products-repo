@@ -143,7 +143,7 @@ export async function createProduct(req: Request, res: Response) {
     const start = Date.now();
 
     // 1- prepare the data for the service
-    const { name, category, stock, status, status_label, price, description } = req.body as Partial<ProductType>;
+    const { name, category, stock, status, price, description } = req.body as Partial<ProductType>;
 
     // 2- pass the prepared data to the service
     const product = {
@@ -151,7 +151,6 @@ export async function createProduct(req: Request, res: Response) {
         category,
         stock,
         status,
-        status_label,
         price,
         description
     }
