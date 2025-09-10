@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import * as productsService from "#features/products/service/products.service.js";
+import * as productsService from "#root/features/products/domain/products.service.js";
 import { NoException, ValidationException } from "#lib/error-handling/error-types.js";
 import { log, LOG_TYPE } from "#root/lib/logger/logger.js";
 import { ProductType } from "../types.js";

@@ -10,7 +10,7 @@
   },
   "servers": [
     {
-      "url": "https://products-repo.onrender.com",
+      "url": "https://products-repo.onrender.com/",
       "description": "Development server"
     }
   ],

@@ -35,16 +35,6 @@ export async function createUser({ email, password, name }: Omit<NewUserType, "p
 
     const user = await authRepository.createUser({ name, email, password: passwordHash })
 
-    // const verificationToken = jwt.sign({
-    //     userId: user.id,
-    //     type: "email_verification",
-    // }, process.env.EMAIL_VERIFICATION_SECRET_KEY as string, { expiresIn: "24h" })
-
-    // // TODO: create a redis queue, and a worker that consumes the jobs from the queue 
-    // sendVerificationMail({ userEmail: user.email, userName: user.name, verificationToken })
-    //     .catch((error) => {
-    //         log(LOG_TYPE.ERROR, { message: "Verification Email sending failed", stack: error.stack });
-    //     })
 
     return {
         name: user.name,
@@ -137,7 +127,6 @@ export async function login({ email, password }: { email: string, password: stri
 export function authSession() {
     return async (req: Request, res: Response, next: NextFunction) => {
         const sessionId = req.cookies[process.env.AUTH_SESSION_NAME as string];
-
         // No cookie? Not authenticated
         if (!sessionId) {
             throw new UnAuthorizedException();
@@ -149,7 +138,7 @@ export function authSession() {
         if (!session) {
             res.clearCookie(process.env.AUTH_SESSION_NAME as string, {
                 httpOnly: true,
-                secure: false,
+                secure: true,
                 sameSite: "lax"
             });
 
@@ -157,10 +146,6 @@ export function authSession() {
         }
 
         const user = JSON.parse(session as string);
-
-        // if (!user.verified) {
-        //     throw new UnVerifiedException()
-        // }
 
         // @ts-ignore
         req.user = {
