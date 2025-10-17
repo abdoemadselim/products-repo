@@ -4,7 +4,6 @@ export type ProductType = {
     category: string,
     price: number,
     stock: number,
-    status: string    
     createdAt: string,
     description: string
 }
