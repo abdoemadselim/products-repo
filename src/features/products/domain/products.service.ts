@@ -30,9 +30,3 @@ export async function createProduct(product: Partial<ProductType>) {
     const result = await productRepository.createProduct(product)
     return result;
 }
-
-export async function getAllProductsStatus() {
-    const productsStatus = await productRepository.getAllProductsStatus();
-    return productsStatus;
-}
-
