@@ -71,7 +71,7 @@ export async function updateProduct(req: Request, res: Response) {
 
     // 1- prepare the data for the service
     const { product_id } = req.params;
-    const { name, category, stock, status, price, description } = req.body;
+    const { name, category, stock, price, description } = req.body;
 
     // 2- pass the prepared data to the service
     const product = {
@@ -110,47 +110,17 @@ export async function updateProduct(req: Request, res: Response) {
     res.json(response)
 }
 
-export async function getAllProductsStatus(req: Request, res: Response) {
-    const start = Date.now();
-
-    //2- pass the data to the service
-    const productsStatus = await productsService.getAllProductsStatus()
-
-    //3- prepare the response
-    const response = {
-        data: {
-            productsStatus
-        },
-        errors: [],
-        code: NoException.NoErrorCode,
-        errorCode: NoException.NoErrorCodeString
-    }
-
-    const durationMs = Date.now() - start;
-
-    log(LOG_TYPE.INFO, {
-        message: "Get All Products Status",
-        method: req.method,
-        path: req.originalUrl,
-        status: 200,
-        durationMs,
-    })
-    res.json(response)
-
-}
-
 export async function createProduct(req: Request, res: Response) {
     const start = Date.now();
 
     // 1- prepare the data for the service
-    const { name, category, stock, status, price, description } = req.body as Partial<ProductType>;
+    const { name, category, stock, price, description } = req.body as Partial<ProductType>;
 
     // 2- pass the prepared data to the service
     const product = {
         name,
         category,
         stock,
-        status,
         price,
         description
     }
