@@ -8,7 +8,6 @@ import validateRequest from "#lib/validation/validator-middleware.js";
 const router = Router();
 
 router.get("/", authSession(), productsControllers.getProductsPage)
-router.get("/status", authSession(), productsControllers.getAllProductsStatus)
 router.delete("/:product_id", authSession(), productsControllers.deleteProduct)
 router.patch("/:product_id", authSession(), validateRequest([productSchema]), productsControllers.updateProduct)
 router.post("/", authSession(), validateRequest([productSchema]), productsControllers.createProduct)
