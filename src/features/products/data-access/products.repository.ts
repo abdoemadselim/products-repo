@@ -16,7 +16,7 @@ const productRepository = {
             // Query with search
             products_result = query(
                 `
-              SELECT product.id as id, product.name as name, category.name as category, created_at, stock, status, price, description
+              SELECT product.id as id, product.name as name, category.name as category, created_at, stock, price, description
               FROM product JOIN category
               ON product.category_id = category.id
               WHERE search_vector @@ to_tsquery('arabic', $1)
@@ -40,7 +40,7 @@ const productRepository = {
             // Query without search - get all products
             products_result = query(
                 `
-              SELECT product.id as id, product.name as name, category.name as category, created_at, stock, status, price, description
+              SELECT product.id as id, product.name as name, category.name as category, created_at, stock, price, description
               FROM product JOIN category
               ON product.category_id = category.id
               ORDER BY created_at DESC
@@ -94,11 +94,11 @@ const productRepository = {
         const category_id = categoryResults.rows[0].category_id;
         const result = await query(
             `UPDATE product
-             SET name = $1, price = $2, category_id = $3, stock = $4, status = $5, description = $6
+             SET name = $1, price = $2, category_id = $3, stock = $4, description = $6
              WHERE id = $7
              RETURNING id`,
             // @ts-ignore
-            [product_data.name, product_data.price, category_id, product_data.stock, product_data.status, product_data.description, product_id]);
+            [product_data.name, product_data.price, category_id, product_data.stock, product_data.description, product_id]);
 
         return result.rows[0];
     },
@@ -113,7 +113,7 @@ const productRepository = {
 
     async createProduct(product: Partial<ProductType>) {
         const {
-            name, category, description, price, stock, status
+            name, category, description, price, stock
         } = product;
 
         const categoryResults = await query(
@@ -129,7 +129,7 @@ const productRepository = {
             const category_id = categoryResults.rows[0].category_id;
             result = await query(
                 `
-                INSERT INTO product(name, category_id, description, price, stock, status)
+                INSERT INTO product(name, category_id, description, price, stock)
                 VALUES($1, $2, $3, $4, $5, $6);
                 `,
                 // @ts-ignore
