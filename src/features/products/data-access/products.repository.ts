@@ -103,14 +103,6 @@ const productRepository = {
         return result.rows[0];
     },
 
-    async getAllProductsStatus() {
-        const result = await query(`
-               SELECT name as status
-               FROM status
-            `)
-        return result.rows;
-    },
-
     async createProduct(product: Partial<ProductType>) {
         const {
             name, category, description, price, stock
