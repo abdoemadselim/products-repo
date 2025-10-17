@@ -27,13 +27,6 @@ export const ProductSchema = z.object({
     .min(0, 'الكمية يجب أن تكون أكبر من أو تساوي صفر')
     .max(999999, 'الكمية كبيرة جداً'),
 
-  status: z
-    .string()
-    .refine(
-      (val) => ['متاح', 'غير متوفر', 'قريباً'].includes(val),
-      'حالة المنتج غير صحيحة'
-    ),
-
   description: z
     .string()
     .min(30, 'وصف المنتج يجب أن يكون 30 حرف على الأقل.')
