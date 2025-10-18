@@ -2,7 +2,7 @@ import { query } from "#lib/db/db-config.js";
 import { ProductType } from "../types.js";
 
 const productRepository = {
-    async getProductsPage({ page, page_size, search }: { page: number, page_size: number, search: string }) {
+    async getProductsPage({ page, page_size, search, sortBy, sortOrder }: { page: number, page_size: number, search: string, sortBy: string, sortOrder: string }) {
         const offset = page * page_size;
 
         // Check if search is empty or just whitespace
@@ -12,6 +12,12 @@ const productRepository = {
         let total_pages_result;
         let search_words = search.trim().split(" ").join("|");
 
+        const validSortColumns = ['name', 'price', 'created_at', 'stock'];
+        const validSortOrders = ['asc', 'desc'];
+
+        const sortBySafe = validSortColumns.includes(sortBy) ? sortBy : 'created_at';
+        const sortOrderSafe = validSortOrders.includes(sortOrder.toLowerCase()) ? sortOrder : 'desc';
+
         if (hasSearch) {
             // Query with search
             products_result = query(
@@ -20,7 +26,7 @@ const productRepository = {
               FROM product JOIN category
               ON product.category_id = category.id
               WHERE search_vector @@ to_tsquery('english', $1)
-              ORDER BY created_at DESC
+              ORDER BY ${sortBySafe} ${sortOrderSafe}
               OFFSET $2 LIMIT $3;
             `,
                 // @ts-ignore
@@ -30,7 +36,7 @@ const productRepository = {
             total_pages_result = query(
                 `
               SELECT COUNT(*) as total 
-              FROM product JOIN category
+              FROM product JOIN category    
               ON product.category_id = category.id
               WHERE search_vector @@ to_tsquery('english', $1)
             `,
@@ -43,7 +49,7 @@ const productRepository = {
               SELECT product.id as id, product.name as name, category.name as category, created_at, stock, price, description
               FROM product JOIN category
               ON product.category_id = category.id
-              ORDER BY created_at DESC
+              ORDER BY ${sortBySafe} ${sortOrderSafe}
               OFFSET $1 LIMIT $2;
             `,
                 // @ts-ignore

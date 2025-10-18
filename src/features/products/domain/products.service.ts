@@ -2,8 +2,8 @@ import productRepository from "#features/products/data-access/products.repositor
 import { NotFoundException } from "#root/lib/error-handling/error-types.js";
 import { ProductType } from "../types.js";
 
-export async function getProductsPage({ page, page_size, search }: { page: number, page_size: number, search: string }) {
-    const products = await productRepository.getProductsPage({ page, page_size, search });
+export async function getProductsPage({ page, page_size, search, sortBy, sortOrder }: { page: number, page_size: number, search: string, sortBy: string, sortOrder: string }) {
+    const products = await productRepository.getProductsPage({ page, page_size, search, sortBy, sortOrder });
     return products;
 }
 

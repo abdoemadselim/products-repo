@@ -7,10 +7,10 @@ import { ProductType } from "../types.js";
 export async function getProductsPage(req: Request, res: Response) {
     const start = Date.now();
     //1- prepare the data for the service
-    const { page = 0, pageSize = 10, search = "" } = req.query
+    const { page = 0, pageSize = 10, search = "", sortBy = "created_at", sortOrder = "desc" } = req.query
 
     //2- pass the data to the service
-    const { products, total } = await productsService.getProductsPage({ page: Number(page), page_size: Number(pageSize), search: search.toString() })
+    const { products, total } = await productsService.getProductsPage({ page: Number(page), page_size: Number(pageSize), search: search.toString(), sortBy: sortBy.toString(), sortOrder: sortOrder.toString() })
 
     //3- prepare the response
     const response = {
