@@ -19,7 +19,7 @@ const productRepository = {
               SELECT product.id as id, product.name as name, category.name as category, created_at, stock, price, description
               FROM product JOIN category
               ON product.category_id = category.id
-              WHERE search_vector @@ to_tsquery('arabic', $1)
+              WHERE search_vector @@ to_tsquery('english', $1)
               ORDER BY created_at DESC
               OFFSET $2 LIMIT $3;
             `,
@@ -32,7 +32,7 @@ const productRepository = {
               SELECT COUNT(*) as total 
               FROM product JOIN category
               ON product.category_id = category.id
-              WHERE search_vector @@ to_tsquery('arabic', $1)
+              WHERE search_vector @@ to_tsquery('english', $1)
             `,
                 [search_words]
             );
