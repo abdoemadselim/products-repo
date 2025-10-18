@@ -46,7 +46,7 @@ const productRepository = {
             // Query without search - get all products
             products_result = query(
                 `
-              SELECT product.id as id, product.name as name, category.name as category, created_at, stock, price, description
+              SELECT product.id as id, product.name as product_name, category.name as category_name, created_at, stock, price, description
               FROM product JOIN category
               ON product.category_id = category.id
               ORDER BY ${sortBySafe} ${sortOrderSafe}
