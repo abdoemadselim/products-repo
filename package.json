@@ -15,7 +15,8 @@
     "start": "node ./dist/main.js",
     "dev": "node --watch ./dist/main.js",
     "watch": "tsc --watch",
-    "build": "rm -rf dist && tsc"
+    "build": "rm -rf dist && tsc",
+    "seed": "tsc && node ./dist/scripts/seed-products.js"
   },
   "keywords": [],
   "author": "",

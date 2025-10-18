@@ -12,7 +12,7 @@ const productRepository = {
         let total_pages_result;
         let search_words = search.trim().split(" ").join("|");
 
-        const validSortColumns = ['name', 'price', 'created_at', 'stock'];
+        const validSortColumns = ['product_name', 'price', 'created_at', 'stock', 'category_name'];
         const validSortOrders = ['asc', 'desc'];
 
         const sortBySafe = validSortColumns.includes(sortBy) ? sortBy : 'created_at';
@@ -22,7 +22,7 @@ const productRepository = {
             // Query with search
             products_result = query(
                 `
-              SELECT product.id as id, product.name as name, category.name as category, created_at, stock, price, description
+              SELECT product.id as id, product.name as product_name, category.name as category_name, created_at, stock, price, description
               FROM product JOIN category
               ON product.category_id = category.id
               WHERE search_vector @@ to_tsquery('english', $1)
