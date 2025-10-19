@@ -183,6 +183,7 @@ interface ProductSeed {
     category: string;
     price: number;
     stock: number;
+    sales: number;
     description: string;
 }
 
@@ -213,11 +214,17 @@ function generateProducts(): ProductSeed[] {
                 variation = sizes[Math.floor(Math.random() * sizes.length)];
             }
 
+            const stock = randomIntInRange(template.stockRange[0], template.stockRange[1]);
+            // Generate sales based on stock - products sell between 0% and 80% of their stock
+            const salesPercentage = Math.random() * 0.8;
+            const sales = Math.floor(stock * salesPercentage);
+
             const product = {
                 name: template.name + variation,
                 category: category,
                 price: parseFloat(randomInRange(template.price[0], template.price[1]).toFixed(2)),
-                stock: randomIntInRange(template.stockRange[0], template.stockRange[1]),
+                stock: stock,
+                sales: sales,
                 description: generateDescription(template.name + variation, category),
             };
 
@@ -264,9 +271,9 @@ async function seedDatabase() {
             const categoryId = categoryIds[product.category];
 
             await client.query(
-                `INSERT INTO product (name, category_id, description, price, stock)
-         VALUES ($1, $2, $3, $4, $5)`,
-                [product.name, categoryId, product.description, product.price, product.stock]
+                `INSERT INTO product (name, category_id, description, price, stock, sales)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+                [product.name, categoryId, product.description, product.price, product.stock, product.sales]
             );
 
             insertedCount++;

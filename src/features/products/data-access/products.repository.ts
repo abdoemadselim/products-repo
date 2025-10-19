@@ -12,7 +12,7 @@ const productRepository = {
         let total_pages_result;
         let search_words = search.trim().split(" ").join("|");
 
-        const validSortColumns = ['product_name', 'price', 'created_at', 'stock', 'category_name'];
+        const validSortColumns = ['product_name', 'price', 'created_at', 'stock', 'sales', 'category_name'];
         const validSortOrders = ['asc', 'desc'];
 
         const sortBySafe = validSortColumns.includes(sortBy) ? sortBy : 'created_at';
@@ -22,7 +22,7 @@ const productRepository = {
             // Query with search
             products_result = query(
                 `
-              SELECT product.id as id, product.name as product_name, category.name as category_name, created_at, stock, price, description
+              SELECT product.id as id, product.name as product_name, category.name as category_name, created_at, stock, sales, price, description
               FROM product JOIN category
               ON product.category_id = category.id
               WHERE search_vector @@ to_tsquery('english', $1)
@@ -46,7 +46,7 @@ const productRepository = {
             // Query without search - get all products
             products_result = query(
                 `
-              SELECT product.id as id, product.name as product_name, category.name as category_name, created_at, stock, price, description
+              SELECT product.id as id, product.name as product_name, category.name as category_name, created_at, stock, sales, price, description
               FROM product JOIN category
               ON product.category_id = category.id
               ORDER BY ${sortBySafe} ${sortOrderSafe}
@@ -100,18 +100,18 @@ const productRepository = {
         const category_id = categoryResults.rows[0].category_id;
         const result = await query(
             `UPDATE product
-             SET name = $1, price = $2, category_id = $3, stock = $4, description = $6
+             SET name = $1, price = $2, category_id = $3, stock = $4, sales = $5, description = $6
              WHERE id = $7
              RETURNING id`,
             // @ts-ignore
-            [product_data.name, product_data.price, category_id, product_data.stock, product_data.description, product_id]);
+            [product_data.name, product_data.price, category_id, product_data.stock, product_data.sales, product_data.description, product_id]);
 
         return result.rows[0];
     },
 
     async createProduct(product: Partial<ProductType>) {
         const {
-            name, category, description, price, stock
+            name, category, description, price, stock, sales
         } = product;
 
         const categoryResults = await query(
@@ -127,11 +127,11 @@ const productRepository = {
             const category_id = categoryResults.rows[0].category_id;
             result = await query(
                 `
-                INSERT INTO product(name, category_id, description, price, stock)
+                INSERT INTO product(name, category_id, description, price, stock, sales)
                 VALUES($1, $2, $3, $4, $5, $6);
                 `,
                 // @ts-ignore
-                [name, category_id, description, price, stock, status]
+                [name, category_id, description, price, stock, sales || 0]
             )
         }
 
