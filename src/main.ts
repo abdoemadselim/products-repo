@@ -15,7 +15,8 @@ const allowedOrigins = [
   "https://adaa-eight.vercel.app", // For Frontend
   "https://eyego-task-production.up.railway.app",
   "http://localhost:3000",
-  "https://products-repo.onrender.com"
+  "https://products-repo.onrender.com",
+  "https://eyego-task-docker-production.up.railway.app"
 ];
 
 app.use(cookieParser())
